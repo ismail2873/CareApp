@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TOKEN =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL211aGFtbWFkYjEyMi5zZy1ob3N0LmNvbSIsImlhdCI6MTc2OTUzNTAyOSwibmJmIjoxNzY5NTM1MDI5LCJleHAiOjE3NzAxMzk4MjksImRhdGEiOnsidXNlciI6eyJpZCI6IjEifX19.JNksnvHbzGDqZRHbm1vyzYXBAGLEXH7uGw_3IjvH33Q';
@@ -28,18 +29,31 @@ const Profile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
+
+        // Retrieve token from AsyncStorage
+        const token = await AsyncStorage.getItem('token');
+
+        if (!token) {
+          // Handle the case where token is not available
+          console.log('Token not found');
+          return;
+        }
+
+        // Make the API request with the token in the Authorization header
         const response = await axios.get(
           'https://muhammadb122.sg-host.com/wp-json/wp/v2/users/me',
           {
             headers: {
-              Authorization: `Bearer ${TOKEN}`,
+              Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
+
         setFirstName(response.data.first_name || '');
         setLastName(response.data.last_name || '');
         setName(response.data.name || '');
@@ -52,7 +66,8 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, []); // Empty dependency array means this will run once when the component mounts
+
 
   const updateProfile = async () => {
     try {
@@ -99,7 +114,7 @@ const Profile = () => {
 
   const logout = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       await axios.post(
         'https://muhammadb122.sg-host.com/wp-json/auth/v1/logout',
         {},
@@ -119,9 +134,12 @@ const Profile = () => {
       setConfirmPassword('');
 
       Alert.alert('Logged Out', 'You have been logged out successfully.');
-
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'SignInto' }],
+      });
       // Navigate to SignInto screen
-      navigation.replace('SignInto');
+      // navigation.replace('SignInto');
     } catch (error) {
       console.log('Logout Error:', error.response?.data || error.message);
       Alert.alert('Error', 'Logout Failed');

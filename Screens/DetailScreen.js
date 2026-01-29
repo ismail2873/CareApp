@@ -25,8 +25,18 @@ const DetailScreen = ({ route, navigation }) => {
           `https://muhammadb122.sg-host.com/wp-json/wp/v2/courses/${course.id}`,
         );
         if (response.data.intro_video) {
-          setVideoUrl(response.data.intro_video.url);
+          // Get the video URL
+          let url = response.data.intro_video.url;
+
+          // Check if the URL starts with http and convert it to https
+          if (url && url.startsWith('http://')) {
+            url = url.replace('http://', 'https://');
+          }
+
+          setVideoUrl(url);  // Set the updated URL
         }
+        console.log('Video URL:', videoUrl);
+        
       } catch (error) {
         console.log('Error fetching intro video:', error);
       }
@@ -45,11 +55,17 @@ const DetailScreen = ({ route, navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.header}>
+                <Image
+                  source={require('./assets/images/logo.png')}
+                  style={styles.logo}
+                />
+              </View>
       {/* Course Image */}
       {course.image && (
-        <Image source={{ uri: course.image }} style={styles.courseImage} />
+        <Image source={{ uri: course.image }} resizeMethod='contain' style={styles.courseImage} />
       )}
-
+<View style={{ paddingHorizontal: 20 }}>
       {/* Course Title */}
       <Text style={styles.courseTitle}>{decodeHtml(course.title)}</Text>
 
@@ -58,12 +74,12 @@ const DetailScreen = ({ route, navigation }) => {
         contentWidth={width - 40}
         source={{ html: course.description }}
         tagsStyles={{
-          p: { color: '#333', fontSize: 14 },
+          p: { color: '#333', fontSize: 14 ,textAlign: 'justify'},
           strong: { fontWeight: 'bold' },
           em: { fontStyle: 'italic' },
         }}
       />
-
+</View>
       {/* Course Video */}
       {videoUrl ? (
         <Video
@@ -93,8 +109,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
+    // padding: 20,
     marginBottom: 28,
+  },
+  header: {
+    backgroundColor: 'darkblue',
+    padding: 10,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 100,
+    height: 30,
+    resizeMode: 'contain',
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 10,
   },
   courseImage: {
     width: '100%',
