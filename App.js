@@ -13,7 +13,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Splash from './Screens/Splash';
 import Home from './Screens/Home';
 import SignIn from './Screens/SignIn';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import SignInto from './Screens/SignInto';
 import DetailScreen from './Screens/DetailScreen';
 import Profile from './Screens/Profile';
@@ -21,6 +21,7 @@ function App() {
   const Stack = createNativeStackNavigator();
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -40,6 +41,7 @@ function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
+    </SafeAreaView>
   );
 }
 
